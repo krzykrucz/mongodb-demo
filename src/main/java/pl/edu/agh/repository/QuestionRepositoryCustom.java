@@ -1,10 +1,9 @@
 package pl.edu.agh.repository;
 
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.mapreduce.MapReduceResults;
-import org.springframework.data.mongodb.core.query.Criteria;
 import pl.edu.agh.model.FieldStats;
 import pl.edu.agh.model.Question;
+import pl.edu.agh.model.QuestionsInYearStats;
 
 import java.util.List;
 
@@ -13,7 +12,7 @@ import java.util.List;
  */
 public interface QuestionRepositoryCustom {
 
-    List<FieldStats> findAggregatedFieldStats(String fieldName, Criteria criteria);
-    <T>MapReduceResults<T> findQuestionsInYearStats(String mapFunctionPath, String reduceFunctionPath, Class<T> clazz);
-    List<Question> findAllTop(Sort sort, int top);
+    List<FieldStats> findAggregatedFieldStats();
+    MapReduceResults<QuestionsInYearStats> findQuestionsInYearStats();
+    List<Question> findAllTop();
 }

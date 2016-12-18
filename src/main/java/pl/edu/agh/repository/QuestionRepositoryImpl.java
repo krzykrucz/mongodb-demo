@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import pl.edu.agh.model.FieldStats;
 import pl.edu.agh.model.Question;
+import pl.edu.agh.model.QuestionsInYearStats;
 
 import java.util.List;
 
@@ -32,11 +33,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
-    public List<FieldStats> findAggregatedFieldStats(String fieldName, Criteria matchCriteria) {
+    public List<FieldStats> findAggregatedFieldStats() {
         TypedAggregation<Question> aggregation = newAggregation(
                 Question.class,
-                Aggregation.match(Criteria.where(fieldName).elemMatch(matchCriteria)),
-                Aggregation.group(fieldName).count().as("occurrence")
+                Aggregation.match(Criteria.where("category").regex("^A")),
+                Aggregation.group("category").count().as("occurrence")
         );
         AggregationResults<FieldStats> results = mongoTemplate.aggregate(aggregation, FieldStats.class);
 
@@ -44,19 +45,20 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
-    public <T>MapReduceResults<T> findQuestionsInYearStats(String mapFunctionPath, String reduceFunctionPath, Class<T> clazz) {
+    public MapReduceResults<QuestionsInYearStats> findQuestionsInYearStats() {
         return mongoOperations.mapReduce(
                 Question.COLLECTION_NAME,
-                mapFunctionPath,
-                reduceFunctionPath,
-                clazz);
+                "classpath:map.js",
+                "classpath:reduce.js",
+                QuestionsInYearStats.class);
     }
 
     @Override
-    public List<Question> findAllTop(Sort sort, int top) {
+    public List<Question> findAllTop() {
+        Sort ascSortOnShowNumber = new Sort(Sort.Direction.ASC, "showNumber");
         Query query = new Query();
-        query.limit(top);
-        query.with(sort);
+        query.limit(50);
+        query.with(ascSortOnShowNumber);
 
         return mongoOperations.find(query, Question.class);
     }

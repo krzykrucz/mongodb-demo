@@ -4,13 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.query.Criteria;
-import pl.edu.agh.model.QuestionsInYearStats;
 import pl.edu.agh.repository.QuestionRepository;
 
+import java.util.logging.Logger;
+
 @SpringBootApplication
-public class MongodbApplication /*implements CommandLineRunner*/ {
+public class MongodbApplication implements CommandLineRunner {
+
+    private final Logger LOGGER = Logger.getLogger("MongoDbApplication");
 
     @Autowired
     private QuestionRepository questionRepository;
@@ -18,20 +19,18 @@ public class MongodbApplication /*implements CommandLineRunner*/ {
     public static void main(String[] args) {
         SpringApplication.run(MongodbApplication.class, args);
     }
-//
-//    @Override
-//    public void run(String... strings) throws Exception {
-//        Criteria startsWithLetterA = (new Criteria()).regex("^A");
-//        questionRepository.findAggregatedFieldStats("category", startsWithLetterA)
-//                .forEach(System.out::println);
-//
-//        questionRepository.findQuestionsInYearStats("classpath:map.js", "classpath:reduce.js", QuestionsInYearStats.class)
-//                .forEach(System.out::println);
-//
-//
-//        Sort ascSortOnShowNumber = new Sort(Sort.Direction.ASC, "showNumber");
-//        questionRepository.findAllTop(ascSortOnShowNumber, 5000)
-//                .forEach(System.out::println);
-//    }
+
+    @Override
+    public void run(String... strings) throws Exception {
+
+        questionRepository.findAggregatedFieldStats()
+                .forEach(o -> LOGGER.info(o.toString()));
+
+        questionRepository.findQuestionsInYearStats()
+                .forEach(o -> LOGGER.info(o.toString()));
+
+        questionRepository.findAllTop()
+                .forEach(o -> LOGGER.info(o.toString()));
+    }
 
 }
