@@ -1,12 +1,12 @@
 package pl.edu.agh.controller;
 
-import com.sun.org.apache.regexp.internal.RE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
 import pl.edu.agh.model.FieldStats;
 import pl.edu.agh.model.Question;
 import pl.edu.agh.model.QuestionsInYearStats;
@@ -23,7 +23,7 @@ import java.util.stream.StreamSupport;
  * Created by hector on 17.12.16.
  */
 
-@RestController("/mongo")
+@Controller
 public class MongoController {
 
     private final QuestionRepository questionRepository;
@@ -33,16 +33,21 @@ public class MongoController {
         this.questionRepository = questionRepository;
     }
 
-    @GetMapping("/aggregation")
+    @GetMapping(value = {"/", "/mongo"})
+    public String mongoView() {
+        return "mongo";
+    }
+
+    @PostMapping("/mongo/aggregation")
     public String getAggregationResults(Model model) {
         Criteria startsWithLetterA = (new Criteria()).regex("^A");
         List<FieldStats> results = questionRepository.findAggregatedFieldStats("category", startsWithLetterA);
         model.addAttribute("results", results);
 
-        return "aggregation";
+        return "redirect:/mongo?aggregation";
     }
 
-    @GetMapping("/mapreduce")
+    @PostMapping("/mongo/mapreduce")
     public String getMapReduceResults(Model model) {
         Iterator<QuestionsInYearStats> mapReduceResultIt = questionRepository
                 .findQuestionsInYearStats(
@@ -57,16 +62,16 @@ public class MongoController {
                 .collect(Collectors.toList());
         model.addAttribute("results", results);
 
-        return "mapreduce";
+        return "redirect:/mongo?mapreduce";
     }
 
-    @GetMapping("/simple")
+    @PostMapping("/mongo/simple")
     public String getSimpleResults(Model model) {
         Sort ascSortOnShowNumber = new Sort(Sort.Direction.ASC, "showNumber");
         List<Question> results = questionRepository.findAllTop(ascSortOnShowNumber, 5000);
         model.addAttribute("results", results);
 
-        return "simple";
+        return "redirect:/mongo?simple";
     }
 
 }

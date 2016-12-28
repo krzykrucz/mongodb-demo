@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Mongo Demo</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+</head>
+<body>
+<div class="container">
+
+    <form action="#" th:action="@{/mongo/mapreduce}" method="post">
+        <button class="btn btn-lg btn-default btn-block" type="submit">Show map reduce</button>
+    </form>
+    <form action="#" th:action="@{/mongo/aggregation}" method="post">
+        <button class="btn btn-lg btn-default btn-block" type="submit">Show aggregation</button>
+    </form>
+    <form action="#" th:action="@{/mongo/simple}" method="post">
+        <button class="btn btn-lg btn-default btn-block" type="submit">Show simple</button>
+    </form>
+</div>
+</body>
+</html>
