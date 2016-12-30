@@ -6,7 +6,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pl.edu.agh.model.FieldStats;
 import pl.edu.agh.model.Question;
 import pl.edu.agh.model.QuestionsInYearStats;
@@ -39,16 +41,16 @@ public class MongoController {
     }
 
     @PostMapping("/mongo/aggregation")
-    public String getAggregationResults(Model model) {
+    public String getAggregationResults(RedirectAttributes redirectAttributes) {
         Criteria startsWithLetterA = (new Criteria()).regex("^A");
         List<FieldStats> results = questionRepository.findAggregatedFieldStats("category", startsWithLetterA);
-        model.addAttribute("results", results);
+        redirectAttributes.addFlashAttribute("aggregationResults", results);
 
         return "redirect:/mongo?aggregation";
     }
 
     @PostMapping("/mongo/mapreduce")
-    public String getMapReduceResults(Model model) {
+    public String getMapReduceResults(RedirectAttributes redirectAttributes) {
         Iterator<QuestionsInYearStats> mapReduceResultIt = questionRepository
                 .findQuestionsInYearStats(
                         "classpath:map.js",
@@ -60,16 +62,16 @@ public class MongoController {
                 .stream(Spliterators
                         .spliteratorUnknownSize(mapReduceResultIt, Spliterator.ORDERED), false)
                 .collect(Collectors.toList());
-        model.addAttribute("results", results);
+        redirectAttributes.addFlashAttribute("mapReduceResults", results);
 
         return "redirect:/mongo?mapreduce";
     }
 
     @PostMapping("/mongo/simple")
-    public String getSimpleResults(Model model) {
+    public String getSimpleResults(RedirectAttributes redirectAttributes) {
         Sort ascSortOnShowNumber = new Sort(Sort.Direction.ASC, "showNumber");
         List<Question> results = questionRepository.findAllTop(ascSortOnShowNumber, 5000);
-        model.addAttribute("results", results);
+        redirectAttributes.addFlashAttribute("simpleResults", results);
 
         return "redirect:/mongo?simple";
     }
